@@ -1,0 +1,84 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USERNAME: postgres
+    command: postgres
+    networks:
+      - backend
+
+  user-service:
+    image: andrey48358424/user-service:latest
+    container_name: user_service
+    restart: always
+    depends_on:
+      - database
+    networks:
+      - backend
+
+  tg-service:
+    image: andrey48358424/tg-service
+    container_name: tg-services
+    restart: always
+    depends_on:
+      - database
+    networks:
+      - backend
+
+  chain:
+    image:
+    container_name: chain
+    restart: always
+    networks:
+      - backend
+
+  front:
+    image:
+    container_name: front-end
+    restart: always
+    networks:
+      - backend
+
+  tx-service:
+    image: andrey48358424/tx-service:latest
+    container_name: tx-services
+    restart: always
+    depends_on:
+      - database
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # порт для AMQP
+      - "15672:15672"  # порт для веб-интерфейса
+    environment:
+      RABBITMQ_DEFAULT_USER: guest  # имя пользователя по умолчанию
+      RABBITMQ_DEFAULT_PASS: guest  # пароль пользователя по умолчанию
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # том для хранения данных
+    networks:
+      - backend
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  backend:
+    driver: bridge
