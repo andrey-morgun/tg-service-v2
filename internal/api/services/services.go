@@ -1,4 +1,4 @@
-package service
+package services
 
 import "tg-service-v2/internal/api/domain"
 

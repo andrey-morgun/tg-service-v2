@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"log"
 	"os"
 	"os/signal"
@@ -12,14 +11,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const serviceName = "skeleton"
-
-//go:embed dbschema/migrations
-var dbMigrationFS embed.FS
+const serviceName = "tg-service"
 
 func main() {
 	a := app.New(serviceName)
-	a.Run(gracefulShutDown(), dbMigrationFS)
+	a.Run(gracefulShutDown())
 }
 
 func gracefulShutDown() context.Context {
