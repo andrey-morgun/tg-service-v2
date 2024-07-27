@@ -66,6 +66,8 @@ func (p ProcessingBuyUsers) GetCarID(chatID int64) (int64, bool) {
 	return 0, false
 }
 
+// registration map users
+
 type PendingUsers map[int64]User
 
 func (u PendingUsers) Add(chatId int64, user User) {
@@ -87,4 +89,34 @@ func (u PendingUsers) Delete(chatId int64) {
 
 func (u PendingUsers) Update(user User) {
 	u[user.ChatID] = user
+}
+
+func (u PendingUsers) Exists(chatId int64) bool {
+	_, ok := u[chatId]
+	if !ok {
+		return false
+	}
+
+	return true
+}
+
+// login
+
+type LoginUsers map[int64]struct{}
+
+func (u LoginUsers) Add(chatId int64) {
+	u[chatId] = struct{}{}
+}
+
+func (u LoginUsers) Delete(chatId int64) {
+	delete(u, chatId)
+}
+
+func (u LoginUsers) Exists(chatId int64) bool {
+	_, ok := u[chatId]
+	if !ok {
+		return false
+	}
+
+	return true
 }

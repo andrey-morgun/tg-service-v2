@@ -59,6 +59,7 @@ func (a *App) Run(ctx context.Context) {
 	a.initValidator()
 	a.populateConfig()
 	a.initChainClient()
+	a.initRedis()
 	a.initTelebot()
 	a.initBroker()
 	a.initRepos()

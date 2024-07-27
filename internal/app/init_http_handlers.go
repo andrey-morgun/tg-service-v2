@@ -8,7 +8,7 @@ import (
 func (a *App) initHandlers() {
 	a.statusHandler = status.NewHandler(a.logger, a.serviceName)
 
-	a.userHandler = users.NewHandler(a.userService, a.chain)
+	a.userHandler = users.NewHandler(a.userService, a.redisService, a.chain, a.logger)
 
 	a.logger.Debug("handlers created")
 }

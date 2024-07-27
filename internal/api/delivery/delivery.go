@@ -16,5 +16,7 @@ type (
 
 	UserHandler interface {
 		Registration(ctx telebot.Context) error
+		Login(ctx telebot.Context) (err error)
+		MsgWatcher(ctx telebot.Context) (err error)
 	}
 )

@@ -2,29 +2,42 @@ package users
 
 import (
 	"fmt"
+	"github.com/andReyM228/lib/auth"
+	"github.com/andReyM228/lib/errs"
+	"github.com/andReyM228/lib/log"
 	"github.com/andReyM228/one/chain_client"
 	"gopkg.in/telebot.v3"
+	"regexp"
 	"strconv"
+
 	"tg-service-v2/internal/api/domain"
 	"tg-service-v2/internal/api/services"
 )
 
 type Handler struct {
 	userService  services.UserService
+	redis        services.RedisService
 	pendingUsers domain.PendingUsers
+	loginUsers   domain.LoginUsers
+	log          log.Logger
 	chain        chain_client.Client
+	reg          *regexp.Regexp
 }
 
-func NewHandler(userService services.UserService, chain chain_client.Client) Handler {
+func NewHandler(userService services.UserService, redis services.RedisService, chain chain_client.Client, log log.Logger) Handler {
 	return Handler{
 		userService:  userService,
+		redis:        redis,
 		chain:        chain,
 		pendingUsers: map[int64]domain.User{},
+		loginUsers:   map[int64]struct{}{},
+		log:          log,
+		reg:          regexp.MustCompile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"),
 	}
 }
 
-func (h Handler) Registration(ctx telebot.Context) error {
-	user, ok := h.pendingUsers.Get(ctx.Sender().ID)
+func (h Handler) Registration(ctx telebot.Context) (err error) {
+	_, ok := h.pendingUsers.Get(ctx.Sender().ID)
 	if !ok {
 		h.pendingUsers.Add(ctx.Sender().ID, domain.User{ChatID: ctx.Sender().ID})
 		if err := ctx.Send("Send your first name:"); err != nil {
@@ -33,6 +46,28 @@ func (h Handler) Registration(ctx telebot.Context) error {
 
 		return nil
 	}
+
+	return nil
+}
+
+func (h Handler) registration(ctx telebot.Context) (err error) {
+	user, ok := h.pendingUsers.Get(ctx.Sender().ID)
+	if !ok {
+		return errs.NotFoundError{What: "registration: user"}
+	}
+
+	defer func() {
+		if err != nil {
+			h.log.Errorf("registration error: ", err)
+
+			err := ctx.Send("error while registration")
+			if err != nil {
+				h.log.Error("failed ctx.Send")
+			}
+
+			return
+		}
+	}()
 
 	switch {
 	case user.Name == "":
@@ -60,6 +95,10 @@ func (h Handler) Registration(ctx telebot.Context) error {
 		h.pendingUsers.Update(user)
 
 	case user.Email == "":
+		if !h.reg.MatchString(ctx.Text()) {
+			return errs.BadRequestError{Cause: "failed validation email"}
+		}
+
 		user.Email = ctx.Text()
 		if err := ctx.Send("Send your password:"); err != nil {
 			return err
@@ -98,6 +137,93 @@ func (h Handler) Registration(ctx telebot.Context) error {
 		if err := ctx.Send("registration was interrupted"); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (h Handler) MsgWatcher(ctx telebot.Context) (err error) {
+	switch {
+	case h.pendingUsers.Exists(ctx.Sender().ID):
+		err := h.registration(ctx)
+		if err != nil {
+			return err
+		}
+
+	case h.loginUsers.Exists(ctx.Sender().ID):
+		err := h.login(ctx)
+		if err != nil {
+			return err
+		}
+
+	default:
+		err := ctx.Send("none text")
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (h Handler) Login(ctx telebot.Context) (err error) {
+	ok := h.loginUsers.Exists(ctx.Sender().ID)
+	if !ok {
+		h.loginUsers.Add(ctx.Sender().ID)
+		if err := ctx.Send("Send your password:"); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return nil
+}
+
+func (h Handler) login(ctx telebot.Context) (err error) {
+	chatID := ctx.Sender().ID
+
+	ok := h.loginUsers.Exists(chatID)
+	if !ok {
+		return errs.NotFoundError{What: "login: user"}
+	}
+
+	defer func() {
+		if err != nil {
+			h.log.Errorf("login error: ", err)
+
+			err := ctx.Send("error while login")
+			if err != nil {
+				h.log.Error("failed ctx.Send")
+			}
+
+			return
+		}
+	}()
+
+	userID, err := h.userService.Login(ctx.Text(), chatID)
+	if err != nil {
+		h.loginUsers.Delete(chatID)
+
+		return err
+	}
+
+	token, err := auth.CreateToken(chatID, userID)
+	if err != nil {
+		h.loginUsers.Delete(chatID)
+
+		return errs.InternalError{Cause: "login: create token"}
+	}
+
+	err = h.redis.AddToken(chatID, token)
+	if err != nil {
+		return err
+	}
+
+	h.loginUsers.Delete(chatID)
+
+	if err := ctx.Send("login successful!"); err != nil {
+		return err
 	}
 
 	return nil
