@@ -34,6 +34,7 @@ type (
 		redisService        services.RedisService
 		statusHandler       delivery.StatusHandler
 		userHandler         delivery.UserHandler
+		carHandler          delivery.CarHandler
 		statusBrokerHandler delivery.BrokerStatusHandler
 		rabbit              rabbit.Rabbit
 		logger              log.Logger

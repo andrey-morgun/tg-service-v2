@@ -19,4 +19,8 @@ type (
 		Login(ctx telebot.Context) (err error)
 		MsgWatcher(ctx telebot.Context) (err error)
 	}
+
+	CarHandler interface {
+		GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
+	}
 )

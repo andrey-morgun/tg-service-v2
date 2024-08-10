@@ -9,6 +9,7 @@ import (
 	"gopkg.in/telebot.v3"
 	"regexp"
 	"strconv"
+	"tg-service-v2/internal/api/delivery/telegram/cars"
 
 	"tg-service-v2/internal/api/domain"
 	"tg-service-v2/internal/api/services"
@@ -127,6 +128,8 @@ func (h Handler) registration(ctx telebot.Context) (err error) {
 			return err
 		}
 
+		// TODO: генерить токен, и зашивать туда акк аддрес
+
 		if err := ctx.Send(fmt.Sprintf("registration successful! your mnemonic: %s", mnemonic)); err != nil {
 			return err
 		}
@@ -222,7 +225,7 @@ func (h Handler) login(ctx telebot.Context) (err error) {
 
 	h.loginUsers.Delete(chatID)
 
-	if err := ctx.Send("login successful!"); err != nil {
+	if err := ctx.Send("login successful!", cars.Menu); err != nil {
 		return err
 	}
 

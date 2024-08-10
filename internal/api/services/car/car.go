@@ -28,8 +28,8 @@ func (s Service) GetCar(carID int64, token string) (domain.Car, error) {
 	return car, nil
 }
 
-func (s Service) GetCars(token, label string) (domain.Cars, error) {
-	cars, err := s.carRepo.GetAll(token, label)
+func (s Service) GetCars(token string) (domain.Cars, error) {
+	cars, err := s.carRepo.GetAll(token)
 	if err != nil {
 		s.log.Error(err.Error())
 		return domain.Cars{}, err

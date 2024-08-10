@@ -1,38 +1,25 @@
 package cars
 
 import (
+	"github.com/andReyM228/lib/log"
 	"tg-service-v2/internal/api/domain"
 	"tg-service-v2/internal/api/services"
 )
 
 type Handler struct {
-	carService services.CarService
+	log          log.Logger
+	carService   services.CarService
+	redisService services.RedisService
 }
 
-func NewHandler(carService services.CarService) Handler {
+func NewHandler(log log.Logger, carService services.CarService, redisService services.RedisService) Handler {
+	initMainMenu()
+
 	return Handler{
-		carService: carService,
+		log:          log,
+		carService:   carService,
+		redisService: redisService,
 	}
-}
-
-//func (h Handler) GetCar(ctx telebot.Context) error {
-//	msg := ctx.Message().Text
-//
-//	car, err := h.carService.GetCar(id, token)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return ctx.Send(car)
-//}
-
-func (h Handler) GetAllCars(token, label string) (domain.Cars, error) {
-	cars, err := h.carService.GetCars(token, label)
-	if err != nil {
-		return domain.Cars{}, err
-	}
-
-	return cars, nil
 }
 
 func (h Handler) GetUserCars(token string) (domain.Cars, error) {
