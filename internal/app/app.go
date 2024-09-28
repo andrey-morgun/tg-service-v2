@@ -57,6 +57,7 @@ func New(name string) App {
 
 func (a *App) Run(ctx context.Context) {
 	a.initLogger()
+	a.initHTTPClient()
 	a.initValidator()
 	a.populateConfig()
 	a.initChainClient()

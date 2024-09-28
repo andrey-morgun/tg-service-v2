@@ -6,6 +6,7 @@ import (
 	"github.com/andReyM228/lib/bus"
 	"github.com/andReyM228/lib/errs"
 	"github.com/andReyM228/lib/rabbit"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -69,11 +70,13 @@ func (r Repository) GetAll(token string) (domain.Cars, error) {
 		return domain.Cars{}, errs.InternalError{Cause: err.Error()}
 	}
 
-	if err = repository.HandleHttpError(resp); err != nil {
-		return domain.Cars{}, err
+	if resp.StatusCode != http.StatusOK {
+		if err = repository.HandleHttpError(resp); err != nil {
+			return domain.Cars{}, err
+		}
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return domain.Cars{}, errs.InternalError{Cause: err.Error()}
 	}

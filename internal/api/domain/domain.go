@@ -11,9 +11,7 @@ type Car struct {
 	CreatedAt time.Time
 }
 
-type Cars struct {
-	Cars []Car
-}
+type Cars []Car
 
 type User struct {
 	ID             int

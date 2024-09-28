@@ -19,6 +19,8 @@ func (h Handler) GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
 			if err := ctx.Send("you are not authorized"); err != nil {
 				return err
 			}
+
+			return nil
 		}
 
 		cars, err := h.carService.GetCars(token)
@@ -28,11 +30,13 @@ func (h Handler) GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
 			if err := ctx.Send("get cars error"); err != nil {
 				return err
 			}
+
+			return nil
 		}
 
-		msg := showCars(cars)
+		carsResp := showCars(cars)
 
-		if err := ctx.Send(msg); err != nil {
+		if err := ctx.Send(carsResp); err != nil {
 			h.log.Errorf("send msg error: ", err)
 			return err
 		}

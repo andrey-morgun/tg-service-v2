@@ -22,5 +22,6 @@ type (
 
 	CarHandler interface {
 		GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
+		GetCar(ctx telebot.Context) error
 	}
 )
