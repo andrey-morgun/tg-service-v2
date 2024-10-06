@@ -13,44 +13,55 @@ services:
     networks:
       - backend
 
-  user-service:
-    image: andrey48358424/user-service:latest
-    container_name: user_service
-    restart: always
-    depends_on:
-      - database
-    networks:
-      - backend
+#  user-service:
+#    image: andrey48358424/user-service:latest
+#    container_name: user_service
+#    restart: always
+#    depends_on:
+#      - database
+#    networks:
+#      - backend
+#
+#  tg-service:
+#    image: andrey48358424/tg-service
+#    container_name: tg-services
+#    restart: always
+#    depends_on:
+#      - database
+#    networks:
+#      - backend
+#
+#  chain:
+#    image:
+#    container_name: chain
+#    restart: always
+#    networks:
+#      - backend
+#
+#  front:
+#    image:
+#    container_name: front-end
+#    restart: always
+#    networks:
+#      - backend
+#
+#  tx-service:
+#    image: andrey48358424/tx-service:latest
+#    container_name: tx-services
+#    restart: always
+#    depends_on:
+#      - database
+#    networks:
+#      - backend
 
-  tg-service:
-    image: andrey48358424/tg-service
-    container_name: tg-services
-    restart: always
-    depends_on:
-      - database
-    networks:
-      - backend
-
-  chain:
-    image:
-    container_name: chain
-    restart: always
-    networks:
-      - backend
-
-  front:
-    image:
-    container_name: front-end
-    restart: always
-    networks:
-      - backend
-
-  tx-service:
-    image: andrey48358424/tx-service:latest
-    container_name: tx-services
-    restart: always
-    depends_on:
-      - database
+  minio:
+    image: 'bitnami/minio:latest'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
     networks:
       - backend
 

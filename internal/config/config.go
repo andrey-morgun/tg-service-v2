@@ -15,6 +15,7 @@ type (
 		HTTP   HTTP                      `yaml:"http" validate:"required"`
 		Extra  Extra                     `yaml:"extra" validate:"required"`
 		Rabbit Rabbit                    `yaml:"rabbit" validate:"required"`
+		Minio  Minio                     `yaml:"minio" validate:"required"`
 		Redis  redis.Config              `yaml:"redis"`
 	}
 
@@ -29,6 +30,13 @@ type (
 
 	Rabbit struct {
 		RabbitUrl string `yaml:"url_rabbit" validate:"required"`
+	}
+
+	Minio struct {
+		Endpoint string `yaml:"endpoint" validate:"required"`
+		User     string `yaml:"user" validate:"required"`
+		Password string `yaml:"password" validate:"required"`
+		Bucket   string `yaml:"bucket" validate:"required"`
 	}
 
 	HTTP struct {

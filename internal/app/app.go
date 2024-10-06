@@ -8,6 +8,7 @@ import (
 	"github.com/andReyM228/one/chain_client"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/minio/minio-go/v7"
 	"gopkg.in/telebot.v3"
 	"net/http"
 	"tg-service-v2/internal/api/delivery"
@@ -43,6 +44,7 @@ type (
 		router              *fiber.App
 		redis               redis.Redis
 		chain               chain_client.Client
+		minio               *minio.Client
 		clientHTTP          *http.Client
 		tgBot               *telebot.Bot
 	}
@@ -62,6 +64,7 @@ func (a *App) Run(ctx context.Context) {
 	a.populateConfig()
 	a.initChainClient()
 	a.initRedis()
+	a.initMinio(ctx)
 	a.initTelebot()
 	a.initBroker()
 	a.initRepos()
@@ -84,7 +87,7 @@ func (a *App) initRepos() {
 }
 
 func (a *App) initServices() {
-	a.carService = car.NewService(a.carRepo, a.logger)
+	a.carService = car.NewService(a.carRepo, a.config.Minio.Bucket, a.minio, a.logger)
 	a.userService = user.NewService(a.userRepo, a.logger)
 	a.redisService = redisService.NewService(a.redisRepo, a.logger)
 

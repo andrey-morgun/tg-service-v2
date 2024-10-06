@@ -3,12 +3,13 @@ package domain
 import "time"
 
 type Car struct {
-	ID        int
-	Name      string
-	Model     string
-	Price     int64
-	Image     string
-	CreatedAt time.Time
+	ID         int
+	Name       string
+	Model      string
+	Price      int64
+	Image      string
+	ImageBytes []byte
+	CreatedAt  time.Time
 }
 
 type Cars []Car

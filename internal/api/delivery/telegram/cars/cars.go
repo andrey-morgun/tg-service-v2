@@ -2,7 +2,7 @@ package cars
 
 import (
 	"bytes"
-	"encoding/base64"
+	"context"
 	"github.com/andReyM228/lib/log"
 	"gopkg.in/telebot.v3"
 	"strconv"
@@ -54,26 +54,14 @@ func (h Handler) GetCar(ctx telebot.Context) error {
 		return nil
 	}
 
-	car, err := h.carService.GetCar(int64(carID), token)
+	car, err := h.carService.GetCar(context.Background(), int64(carID), token)
 	if err != nil {
 		return err
 	}
 
 	resp := showCar(car)
 
-	carImageBytes, err := base64.StdEncoding.DecodeString(car.Image)
-	if err != nil {
-		h.log.Errorf("/get-car error (decode base64 image): ", err)
-
-		err := ctx.Send("error while get car")
-		if err != nil {
-			h.log.Error("failed ctx.Send")
-		}
-
-		return nil
-	}
-
-	reader := bytes.NewReader(carImageBytes)
+	reader := bytes.NewReader(car.ImageBytes)
 
 	carImage := &telebot.Photo{
 		File:    telebot.FromReader(reader),
