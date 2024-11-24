@@ -17,6 +17,7 @@ type (
 		Rabbit Rabbit                    `yaml:"rabbit" validate:"required"`
 		Minio  Minio                     `yaml:"minio" validate:"required"`
 		Redis  redis.Config              `yaml:"redis"`
+		Etcd   Etcd                      `yaml:"etcd"`
 	}
 
 	TgBot struct {
@@ -29,7 +30,7 @@ type (
 	}
 
 	Rabbit struct {
-		RabbitUrl string `yaml:"url_rabbit" validate:"required"`
+		RabbitUrl string `yaml:"url-rabbit" validate:"required"`
 	}
 
 	Minio struct {
@@ -43,12 +44,16 @@ type (
 		Port int `yaml:"port" validate:"required"`
 	}
 
+	Etcd struct {
+		ConnString string `yaml:"conn-string" validate:"required"`
+	}
+
 	Extra struct {
-		CarPaymentAddress string `yaml:"car_payment_address" validate:"required"`
-		UrlGetAllCars     string `yaml:"url_get_all_cars" validate:"required"`
-		UrlGetUserCars    string `yaml:"url_get_user_cars" validate:"required"`
-		UrlBuyCar         string `yaml:"url_buy_car" validate:"required"`
-		UrlSellCar        string `yaml:"url_sell_car" validate:"required"`
+		CarPaymentAddress string `yaml:"car-payment-address" validate:"required"`
+		UrlGetAllCars     string `yaml:"url-get-all-cars" validate:"required"`
+		UrlGetUserCars    string `yaml:"url-get-user-cars" validate:"required"`
+		UrlBuyCar         string `yaml:"url-buy-car" validate:"required"`
+		UrlSellCar        string `yaml:"url-sell-car" validate:"required"`
 	}
 )
 

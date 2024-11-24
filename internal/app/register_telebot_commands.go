@@ -6,14 +6,13 @@ import (
 )
 
 func (a *App) registerTelebotCommands(ctx context.Context) {
-	a.tgBot.Handle("/start", func(c telebot.Context) error {
-		return nil
-	})
+	a.tgBot.Handle("/start", a.startHandler.Start)
 
 	a.tgBot.Handle("/registration", a.userHandler.Registration)
 	a.tgBot.Handle("/login", a.userHandler.Login)
 	a.tgBot.Handle("/getcar", a.carHandler.GetCar)
-	a.tgBot.Handle(telebot.OnText, a.userHandler.MsgWatcher)
+	a.tgBot.Handle(telebot.OnText, a.watcherHandler.MsgWatcher)
 
 	a.tgBot.Handle(a.carHandler.GetCarsButton())
+	a.tgBot.Handle(a.carHandler.BuyCarButton())
 }

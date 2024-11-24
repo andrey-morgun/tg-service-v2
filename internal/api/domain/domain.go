@@ -1,6 +1,15 @@
 package domain
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
+
+const (
+	PendingUsersPrefix = "pending-users"
+	LoginUsersPrefix   = "login-users"
+	BuyersUsersPrefix  = "buyers-users"
+)
 
 type Car struct {
 	ID         int
@@ -13,6 +22,11 @@ type Car struct {
 }
 
 type Cars []Car
+
+type CarIDAndPrice struct {
+	ID    int
+	Price int64
+}
 
 type User struct {
 	ID             int
@@ -37,85 +51,10 @@ type CarCharacteristics struct {
 	DriveType    string `json:"drive_type,omitempty"`
 }
 
-type ProcessingBuyUsers map[int64]int64
-
-func (p ProcessingBuyUsers) Create(chatID, carID int64) {
-	p[chatID] = carID
+type CarInfo struct {
+	CarID int64 `json:"car_id"`
 }
 
-func (p ProcessingBuyUsers) Delete(chatID int64) {
-	delete(p, chatID)
-}
-
-func (p ProcessingBuyUsers) IfExists(chatID int64) bool {
-	_, ok := p[chatID]
-	if ok {
-		return true
-	}
-
-	return false
-}
-
-func (p ProcessingBuyUsers) GetCarID(chatID int64) (int64, bool) {
-	carID, ok := p[chatID]
-	if ok {
-		return carID, true
-	}
-
-	return 0, false
-}
-
-// registration map users
-
-type PendingUsers map[int64]User
-
-func (u PendingUsers) Add(chatId int64, user User) {
-	u[chatId] = user
-}
-
-func (u PendingUsers) Get(chatId int64) (User, bool) {
-	user, ok := u[chatId]
-	if !ok {
-		return User{}, false
-	}
-
-	return user, true
-}
-
-func (u PendingUsers) Delete(chatId int64) {
-	delete(u, chatId)
-}
-
-func (u PendingUsers) Update(user User) {
-	u[user.ChatID] = user
-}
-
-func (u PendingUsers) Exists(chatId int64) bool {
-	_, ok := u[chatId]
-	if !ok {
-		return false
-	}
-
-	return true
-}
-
-// login
-
-type LoginUsers map[int64]struct{}
-
-func (u LoginUsers) Add(chatId int64) {
-	u[chatId] = struct{}{}
-}
-
-func (u LoginUsers) Delete(chatId int64) {
-	delete(u, chatId)
-}
-
-func (u LoginUsers) Exists(chatId int64) bool {
-	_, ok := u[chatId]
-	if !ok {
-		return false
-	}
-
-	return true
+func GenKey(prefix, key string) string {
+	return fmt.Sprintf("%s:%s", prefix, key)
 }

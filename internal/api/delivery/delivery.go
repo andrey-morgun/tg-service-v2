@@ -6,6 +6,10 @@ import (
 )
 
 type (
+	StartHandler interface {
+		Start(ctx telebot.Context) error
+	}
+
 	StatusHandler interface {
 		CheckStatus(ctx *fiber.Ctx) error
 	}
@@ -17,11 +21,15 @@ type (
 	UserHandler interface {
 		Registration(ctx telebot.Context) error
 		Login(ctx telebot.Context) (err error)
-		MsgWatcher(ctx telebot.Context) (err error)
 	}
 
 	CarHandler interface {
 		GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
+		BuyCarButton() (*telebot.Btn, func(ctx telebot.Context) error)
 		GetCar(ctx telebot.Context) error
+	}
+
+	Watcher interface {
+		MsgWatcher(ctx telebot.Context) (err error)
 	}
 )

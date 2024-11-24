@@ -7,7 +7,7 @@ type (
 		Get(id int64, token string) (domain.Car, error)
 		GetAll(token string) (domain.Cars, error)
 		GetUserCars(token string) (domain.Cars, error)
-		BuyCar(token, txHash string, carID int64) error
+		BuyCar(chatID, carID int64, txHash string) error
 		SellCar(chatID, carID int64, token string) error
 	}
 

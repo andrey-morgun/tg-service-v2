@@ -121,10 +121,10 @@ func (r Repository) GetUserCars(token string) (domain.Cars, error) {
 	return cars, nil
 }
 
-func (r Repository) BuyCar(token, txHash string, carID int64) error {
-	url := r.cfg.Extra.UrlBuyCar
+func (r Repository) SellCar(chatID, carID int64, token string) error {
+	url := fmt.Sprintf(r.cfg.Extra.UrlSellCar, chatID, carID)
 
-	url = strings.Replace(url, ":tx_hash", txHash, 1)
+	url = strings.Replace(url, ":chat_id", strconv.FormatInt(chatID, 10), 1)
 	url = strings.Replace(url, ":car_id", strconv.FormatInt(carID, 10), 1)
 
 	req, err := http.NewRequest(http.MethodPost, url, nil)
@@ -146,25 +146,17 @@ func (r Repository) BuyCar(token, txHash string, carID int64) error {
 	return nil
 }
 
-func (r Repository) SellCar(chatID, carID int64, token string) error {
-	url := fmt.Sprintf(r.cfg.Extra.UrlSellCar, chatID, carID)
-
-	url = strings.Replace(url, ":chat_id", strconv.FormatInt(chatID, 10), 1)
-	url = strings.Replace(url, ":car_id", strconv.FormatInt(carID, 10), 1)
-
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		return errs.InternalError{Cause: err.Error()}
-	}
-
-	req.Header.Add("Authorization", token)
-
-	resp, err := r.client.Do(req)
+func (r Repository) BuyCar(chatID, carID int64, txHash string) error {
+	result, err := r.rabbit.Request(bus.SubjectUserServiceBuyCar, bus.BuyCarRequest{
+		ChatID: chatID,
+		CarID:  carID,
+		TxHash: txHash,
+	})
 	if err != nil {
 		return err
 	}
 
-	if err = repository.HandleHttpError(resp); err != nil {
+	if err = repository.HandleBrokerError(result); err != nil {
 		return err
 	}
 

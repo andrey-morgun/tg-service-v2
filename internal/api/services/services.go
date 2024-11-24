@@ -10,7 +10,7 @@ type (
 		GetCar(ctx context.Context, carID int64, token string) (domain.Car, error)
 		GetCars(token string) (domain.Cars, error)
 		GetUserCars(token string) (domain.Cars, error)
-		BuyCar(token, txHash string, carID int64) error
+		BuyCar(chatID, carID int64, txHash string) error
 		SellCar(chatID, carID int64, token string) error
 	}
 
@@ -23,5 +23,11 @@ type (
 	RedisService interface {
 		AddToken(chatID int64, token string) error
 		GetToken(chatID int64) (string, error)
+	}
+
+	UserMapsService interface {
+		Put(ctx context.Context, key string, values ...interface{}) error
+		Fetch(ctx context.Context, key string, receiver ...interface{}) bool
+		Delete(ctx context.Context, key string) error
 	}
 )

@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio-go/v7"
+	"go.etcd.io/etcd/client/v3"
 	"gopkg.in/telebot.v3"
 	"net/http"
 	"tg-service-v2/internal/api/delivery"
@@ -20,6 +21,7 @@ import (
 	"tg-service-v2/internal/api/services/car"
 	redisService "tg-service-v2/internal/api/services/redis"
 	"tg-service-v2/internal/api/services/user"
+	"tg-service-v2/internal/api/services/user_maps"
 	"tg-service-v2/internal/config"
 )
 
@@ -33,11 +35,15 @@ type (
 		carService          services.CarService
 		userService         services.UserService
 		redisService        services.RedisService
+		userMapsService     services.UserMapsService
 		statusHandler       delivery.StatusHandler
 		userHandler         delivery.UserHandler
 		carHandler          delivery.CarHandler
 		statusBrokerHandler delivery.BrokerStatusHandler
+		watcherHandler      delivery.Watcher
+		startHandler        delivery.StartHandler
 		rabbit              rabbit.Rabbit
+		etcdClient          *clientv3.Client
 		logger              log.Logger
 		validator           *validator.Validate
 		serviceName         string
@@ -67,6 +73,7 @@ func (a *App) Run(ctx context.Context) {
 	a.initMinio(ctx)
 	a.initTelebot()
 	a.initBroker()
+	a.initEtcd()
 	a.initRepos()
 	a.initServices()
 	a.initHandlers()
@@ -90,6 +97,7 @@ func (a *App) initServices() {
 	a.carService = car.NewService(a.carRepo, a.config.Minio.Bucket, a.minio, a.logger)
 	a.userService = user.NewService(a.userRepo, a.logger)
 	a.redisService = redisService.NewService(a.redisRepo, a.logger)
+	a.userMapsService = user_maps.NewService(a.etcdClient, a.logger)
 
 	a.logger.Debug("services created")
 }

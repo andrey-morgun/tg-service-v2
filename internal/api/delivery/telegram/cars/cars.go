@@ -3,25 +3,40 @@ package cars
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"github.com/andReyM228/lib/log"
 	"gopkg.in/telebot.v3"
 	"strconv"
+	"tg-service-v2/internal/api/domain"
 	"tg-service-v2/internal/api/services"
+	"tg-service-v2/internal/config"
 )
 
 type Handler struct {
-	log          log.Logger
-	carService   services.CarService
-	redisService services.RedisService
+	log             log.Logger
+	tgBot           *telebot.Bot
+	config          config.Extra
+	carService      services.CarService
+	redisService    services.RedisService
+	userMapsService services.UserMapsService
 }
 
-func NewHandler(log log.Logger, carService services.CarService, redisService services.RedisService) Handler {
-	initMainMenu()
+func NewHandler(
+	log log.Logger,
+	tgBot *telebot.Bot,
+	config config.Extra,
+	carService services.CarService,
+	redisService services.RedisService,
+	userMapsService services.UserMapsService) Handler {
 
+	initMainMenu()
 	return Handler{
-		log:          log,
-		carService:   carService,
-		redisService: redisService,
+		log:             log,
+		tgBot:           tgBot,
+		config:          config,
+		carService:      carService,
+		redisService:    redisService,
+		userMapsService: userMapsService,
 	}
 }
 
@@ -68,7 +83,26 @@ func (h Handler) GetCar(ctx telebot.Context) error {
 		Caption: resp,
 	}
 
-	err = ctx.SendAlbum(telebot.Album{carImage})
+	carDataJson, err := json.Marshal(domain.CarIDAndPrice{
+		ID:    car.ID,
+		Price: car.Price,
+	})
+	if err != nil {
+		return err
+	}
+
+	buyCarBtn := telebot.Btn{
+		Unique: "buy_car",
+		Text:   "Buy Car",
+		Data:   string(carDataJson),
+	}
+
+	inlineKeyboard := &telebot.ReplyMarkup{}
+	inlineKeyboard.Inline(
+		inlineKeyboard.Row(buyCarBtn),
+	)
+
+	err = ctx.Send(carImage, inlineKeyboard)
 	if err != nil {
 		h.log.Errorf("/get-car error (send resp): ", err)
 

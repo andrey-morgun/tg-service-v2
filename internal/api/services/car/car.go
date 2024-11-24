@@ -65,8 +65,8 @@ func (s Service) GetUserCars(token string) (domain.Cars, error) {
 	return cars, nil
 }
 
-func (s Service) BuyCar(token, txHash string, carID int64) error {
-	err := s.carRepo.BuyCar(token, txHash, carID)
+func (s Service) BuyCar(chatID, carID int64, txHash string) error {
+	err := s.carRepo.BuyCar(chatID, carID, txHash)
 	if err != nil {
 		s.log.Error(err.Error())
 		return err
