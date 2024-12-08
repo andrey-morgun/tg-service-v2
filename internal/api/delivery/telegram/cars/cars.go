@@ -8,6 +8,7 @@ import (
 	"gopkg.in/telebot.v3"
 	"strconv"
 	"tg-service-v2/internal/api/domain"
+	"tg-service-v2/internal/api/domain/menu"
 	"tg-service-v2/internal/api/services"
 	"tg-service-v2/internal/config"
 )
@@ -29,7 +30,8 @@ func NewHandler(
 	redisService services.RedisService,
 	userMapsService services.UserMapsService) Handler {
 
-	initMainMenu()
+	menu.InitMainMenu()
+	menu.InitCarsMenu()
 	return Handler{
 		log:             log,
 		tgBot:           tgBot,

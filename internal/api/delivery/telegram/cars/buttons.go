@@ -7,18 +7,11 @@ import (
 	"gopkg.in/telebot.v3"
 	"strconv"
 	"tg-service-v2/internal/api/domain"
-)
-
-var (
-	// TODO: меню экспортируемое - треш
-	Menu = &telebot.ReplyMarkup{ResizeKeyboard: true}
-
-	carsButton   = Menu.Text("Cars🚘")
-	tokensButton = Menu.Text("Tokens💵")
+	"tg-service-v2/internal/api/domain/menu"
 )
 
 func (h Handler) GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error) {
-	return &carsButton, func(ctx telebot.Context) error {
+	return &menu.ShopButton, func(ctx telebot.Context) error {
 		token, err := h.redisService.GetToken(ctx.Chat().ID)
 		if err != nil {
 			h.log.Errorf("get user token error: ", err)
@@ -41,7 +34,42 @@ func (h Handler) GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
 			return nil
 		}
 
-		carsResp := showCars(cars)
+		carsResp := showShopCars(cars)
+
+		if err := ctx.Send(carsResp); err != nil {
+			h.log.Errorf("send msg error: ", err)
+			return err
+		}
+
+		return nil
+	}
+}
+
+func (h Handler) UserCarsButton() (*telebot.Btn, func(ctx telebot.Context) error) {
+	return &menu.MyCarsButton, func(ctx telebot.Context) error {
+		token, err := h.redisService.GetToken(ctx.Chat().ID)
+		if err != nil {
+			h.log.Errorf("get user token error: ", err)
+
+			if err := ctx.Send("you are not authorized"); err != nil {
+				return err
+			}
+
+			return nil
+		}
+
+		cars, err := h.carService.GetUserCars(token)
+		if err != nil {
+			h.log.Errorf("get user-cars error: ", err)
+
+			if err := ctx.Send("get user-cars error"); err != nil {
+				return err
+			}
+
+			return nil
+		}
+
+		carsResp := showUserCars(cars)
 
 		if err := ctx.Send(carsResp); err != nil {
 			h.log.Errorf("send msg error: ", err)
@@ -93,6 +121,27 @@ func (h Handler) BuyCarButton() (*telebot.Btn, func(ctx telebot.Context) error) 
 			car.Price, h.config.CarPaymentAddress),
 			&telebot.SendOptions{ParseMode: telebot.ModeHTML}); err != nil {
 			h.log.Errorf("send msg error: %v", err)
+			return err
+		}
+
+		return nil
+	}
+}
+
+func (h Handler) GetCarsMenu() (*telebot.Btn, func(ctx telebot.Context) error) {
+	return &menu.CarsButton, func(ctx telebot.Context) error {
+		_, err := h.redisService.GetToken(ctx.Chat().ID)
+		if err != nil {
+			h.log.Errorf("get user token error: ", err)
+
+			if err := ctx.Send("you are not authorized"); err != nil {
+				return err
+			}
+
+			return nil
+		}
+
+		if err := ctx.Send("ℹ️Here you can see your cars or buy new onesℹ️", menu.CarsMenu); err != nil {
 			return err
 		}
 

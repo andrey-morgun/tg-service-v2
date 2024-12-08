@@ -7,7 +7,6 @@ import (
 	"github.com/andReyM228/lib/errs"
 	"github.com/andReyM228/lib/rabbit"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -101,21 +100,23 @@ func (r Repository) GetUserCars(token string) (domain.Cars, error) {
 
 	resp, err := r.client.Do(req)
 	if err != nil {
-		return domain.Cars{}, errs.InternalError{Cause: err.Error()}
+		return domain.Cars{}, errs.InternalError{Cause: fmt.Sprintf("error while doing request %s", err.Error())}
 	}
 
-	if err = repository.HandleHttpError(resp); err != nil {
-		return domain.Cars{}, err
+	if resp.StatusCode != http.StatusOK {
+		if err = repository.HandleHttpError(resp); err != nil {
+			return domain.Cars{}, err
+		}
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return domain.Cars{}, errs.InternalError{Cause: err.Error()}
 	}
 
 	var cars domain.Cars
 	if err := json.Unmarshal(data, &cars); err != nil {
-		return domain.Cars{}, errs.InternalError{Cause: err.Error()}
+		return domain.Cars{}, errs.InternalError{Cause: fmt.Sprintf("error while unmarshal data %s", err.Error())}
 	}
 
 	return cars, nil

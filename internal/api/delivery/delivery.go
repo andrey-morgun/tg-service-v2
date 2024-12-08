@@ -27,6 +27,8 @@ type (
 		GetCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
 		BuyCarButton() (*telebot.Btn, func(ctx telebot.Context) error)
 		GetCar(ctx telebot.Context) error
+		GetCarsMenu() (*telebot.Btn, func(ctx telebot.Context) error)
+		UserCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
 	}
 
 	Watcher interface {

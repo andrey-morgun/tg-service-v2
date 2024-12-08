@@ -15,4 +15,6 @@ func (a *App) registerTelebotCommands(ctx context.Context) {
 
 	a.tgBot.Handle(a.carHandler.GetCarsButton())
 	a.tgBot.Handle(a.carHandler.BuyCarButton())
+	a.tgBot.Handle(a.carHandler.GetCarsMenu())
+	a.tgBot.Handle(a.carHandler.UserCarsButton())
 }

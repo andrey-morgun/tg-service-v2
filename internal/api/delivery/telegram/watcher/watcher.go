@@ -10,8 +10,8 @@ import (
 	"gopkg.in/telebot.v3"
 	"regexp"
 	"strconv"
-	"tg-service-v2/internal/api/delivery/telegram/cars"
 	"tg-service-v2/internal/api/domain"
+	"tg-service-v2/internal/api/domain/menu"
 	"tg-service-v2/internal/api/services"
 )
 
@@ -270,7 +270,7 @@ func (h Handler) login(ctx telebot.Context) (err error) {
 		domain.GenKey(domain.LoginUsersPrefix, strconv.FormatInt(ctx.Sender().ID, 10)),
 	)
 
-	if err := ctx.Send("login successful!", cars.Menu); err != nil {
+	if err := ctx.Send("login successful!", menu.MainMenu); err != nil {
 		return err
 	}
 

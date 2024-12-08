@@ -30,14 +30,7 @@ var (
 	commandGetCar = "🎁 `/getcar %d`"
 )
 
-// TODO: refactor
-func initMainMenu() {
-	Menu.Reply(
-		Menu.Row(carsButton, tokensButton),
-	)
-}
-
-func showCars(cars domain.Cars) string {
+func showShopCars(cars domain.Cars) string {
 	var result string
 
 	for _, car := range cars {
@@ -54,4 +47,15 @@ func showCar(car domain.Car) string {
 	result = fmt.Sprintf(carTemplateInfo, car.ID, car.Name, car.Model, car.Price)
 
 	return result
+}
+
+func showUserCars(cars domain.Cars) string {
+	var result string
+
+	for _, car := range cars {
+		result += fmt.Sprintf(carTemplateInfo, car.ID, car.Name, car.Model, car.Price)
+		result += "\n"
+	}
+
+	return fmt.Sprintf(mainTemplate, result)
 }
