@@ -40,18 +40,21 @@ func NewHandler(userService services.UserService, redis services.RedisService, u
 func (h Handler) MsgWatcher(ctx telebot.Context) (err error) {
 	switch {
 	case h.userMapsService.Fetch(context.Background(), domain.GenKey(domain.PendingUsersPrefix, strconv.FormatInt(ctx.Sender().ID, 10))):
+		h.log.Info("🌟 fetch registration event")
 		err := h.registration(ctx)
 		if err != nil {
 			return err
 		}
 
 	case h.userMapsService.Fetch(context.Background(), domain.GenKey(domain.LoginUsersPrefix, strconv.FormatInt(ctx.Sender().ID, 10))):
+		h.log.Info("🌟 fetch login event")
 		err := h.login(ctx)
 		if err != nil {
 			return err
 		}
 
 	case h.userMapsService.Fetch(context.Background(), domain.GenKey(domain.BuyersUsersPrefix, strconv.FormatInt(ctx.Sender().ID, 10))):
+		h.log.Info("🌟 fetch buy-car event")
 		err := h.buyCar(ctx)
 		if err != nil {
 			return err

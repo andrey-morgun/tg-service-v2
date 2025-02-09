@@ -119,7 +119,7 @@ func (h Handler) BuyCarButton() (*telebot.Btn, func(ctx telebot.Context) error) 
 			"<b>Make transfer:</b> <i>%d one</i> to the following address: <code>%s</code>\n"+
 				"<b>Then:</b> send the transaction hash to the chat to complete your purchase.",
 			car.Price, h.config.CarPaymentAddress),
-			&telebot.SendOptions{ParseMode: telebot.ModeHTML}); err != nil {
+			&telebot.SendOptions{ParseMode: telebot.ModeHTML}, menu.TransferMenu); err != nil {
 			h.log.Errorf("send msg error: %v", err)
 			return err
 		}
@@ -141,7 +141,7 @@ func (h Handler) GetCarsMenu() (*telebot.Btn, func(ctx telebot.Context) error) {
 			return nil
 		}
 
-		if err := ctx.Send("ℹ️Here you can see your cars or buy new onesℹ️", menu.CarsMenu); err != nil {
+		if err := ctx.Send(" ℹ️ Here you can see your cars or buy new ones ℹ️ ", menu.CarsMenu); err != nil {
 			return err
 		}
 

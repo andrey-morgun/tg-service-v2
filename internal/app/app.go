@@ -42,6 +42,7 @@ type (
 		statusBrokerHandler delivery.BrokerStatusHandler
 		watcherHandler      delivery.Watcher
 		startHandler        delivery.StartHandler
+		systemHandler       delivery.SystemButtons
 		rabbit              rabbit.Rabbit
 		etcdClient          *clientv3.Client
 		logger              log.Logger

@@ -31,6 +31,7 @@ require (
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d // indirect
 	github.com/andReyM228/lib/auth v1.0.2 // indirect
 	github.com/andReyM228/one v1.0.0 // indirect
+	github.com/andrey-morgun/lib v1.0.5 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

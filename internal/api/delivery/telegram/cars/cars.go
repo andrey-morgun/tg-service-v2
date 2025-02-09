@@ -32,6 +32,7 @@ func NewHandler(
 
 	menu.InitMainMenu()
 	menu.InitCarsMenu()
+	menu.InitTransferMenu()
 	return Handler{
 		log:             log,
 		tgBot:           tgBot,

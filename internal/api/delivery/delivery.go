@@ -31,6 +31,10 @@ type (
 		UserCarsButton() (*telebot.Btn, func(ctx telebot.Context) error)
 	}
 
+	SystemButtons interface {
+		BackButton() (*telebot.Btn, func(ctx telebot.Context) error)
+	}
+
 	Watcher interface {
 		MsgWatcher(ctx telebot.Context) (err error)
 	}
